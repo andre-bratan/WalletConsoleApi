@@ -1,0 +1,32 @@
+﻿name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    name: Build the project
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v5
+
+      - id: dotnet
+        name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.200
+
+      - id: restore
+        name: Restore packages
+        run: dotnet restore --locked-mode
+
+      - id: build
+        name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # Tests are integrational thus will not work without the pre-built "walletconsole" utility executable
+      #- id: test
+      #  name: Test solution
+      #  run: dotnet test --no-restore --no-build --configuration Release

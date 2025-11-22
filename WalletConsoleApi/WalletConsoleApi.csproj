@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <!-- XML documentation for Swagger -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- Disable Warning CS1591 "Missing XML comment for publicly visible type or member" - https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs1591 -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup Label="External Dependencies">
+        <!-- https://github.com/domaindrivendev/Swashbuckle.AspNetCore/releases -->
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    </ItemGroup>
+
+    <ItemGroup Label="File nesting">
+        <!-- This section is nesting appsettings.*.json files under main appsettings.json
+           Items have to be re-added because Microsoft.NET.Sdk.Web already defines them, othervise you'll get the following error:
+           "Duplicate 'Content' items were included. The .NET SDK includes 'Content' items from your project directory by default" -->
+        <Content Remove="appsettings.json" />
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Remove="appsettings.Development.json" />
+        <Content Include="appsettings.Development.json">
+            <DependentUpon>appsettings.json</DependentUpon>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <!-- <Content Remove="appsettings.Staging.json" /> -->
+        <!-- <Content Include="appsettings.Staging.json"> -->
+        <!--     <DependentUpon>appsettings.json</DependentUpon> -->
+        <!--     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> -->
+        <!-- </Content> -->
+        <!-- <Content Remove="appsettings.Production.json" /> -->
+        <!-- <Content Include="appsettings.Production.json"> -->
+        <!--     <DependentUpon>appsettings.json</DependentUpon> -->
+        <!--     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> -->
+        <!-- </Content> -->
+    </ItemGroup>
+
+    <ItemGroup Label="WalletConsole Utility">
+        <Content Include="WalletConsole\walletconsole" Condition="Exists('WalletConsole\walletconsole')">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <Target Name="Warn if WalletConsole is missing" BeforeTargets="Build">
+        <Warning Text="The file 'WalletConsole\walletconsole' does not exist and will not be copied." Condition="!Exists('WalletConsole\walletconsole')" />
+    </Target>
+
+</Project>
